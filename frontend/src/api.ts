@@ -18,7 +18,7 @@ export const uploadAudio = async (file: File) => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const response = await fetch('/api/transcribe', {
+  const response = await fetch('http://localhost:8000/api/transcribe', {
     method: 'POST',
     body: formData,
   })
@@ -38,7 +38,7 @@ export const uploadAudio = async (file: File) => {
     content: transcriptContent,
   }
 
-  const summaryResponse = await fetch('/api/summarize', {
+  const summaryResponse = await fetch('http://localhost:8000/api/summarize', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export const uploadAudio = async (file: File) => {
 }
 
 export const updateSettings = async (settings: Settings) => {
-  const response = await fetch('/api/settings', {
+  const response = await fetch('http://localhost:8000/api/settings', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
