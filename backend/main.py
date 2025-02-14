@@ -5,11 +5,19 @@ from faster_whisper import WhisperModel
 import openai
 import os
 import uuid
+import re
 from typing import List
 from pydantic import BaseModel
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 app = FastAPI()
+
+from openai import OpenAI
+
+client = OpenAI(
+  base_url="https://openrouter.ai/api/v1",
+  api_key="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"
+)
 
 # Load settings from file
 settings_file = "settings.txt"
@@ -20,7 +28,7 @@ if os.path.exists(settings_file):
     openai_api_key = settings[1]
     openai_endpoint = settings[2]
 else:
-    system_prompt = "Summarize the following text:"
+    system_prompt = "Summarize the following text. Respond with just the summary:"
     openai_api_key = ""
     openai_endpoint = ""
 
@@ -139,34 +147,60 @@ async def transcribe(file: UploadFile = File(...)):
         print(f"Error transcribing audio: {e}")
         return {"error": str(e)}
 
+def sanitize_filename(filename):
+    # Remove or replace characters that are not allowed in filenames
+    sanitized = re.sub(r'[<>:"/\\|?*]', '', filename)
+    # Truncate to a reasonable length
+    return sanitized[:255]
+
 @app.post("/api/summarize")
 async def summarize(transcript: str):
+    print(f"transcript: {transcript}")
+
     # Summarize transcript with OpenAI
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"{system_prompt}\n\n{transcript}",
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = client.chat.completions.create(
+    model="openai/gpt-4o",
+    messages=[
+        {
+        "role": "user",
+        "content": f"{system_prompt}\n\n{transcript}"
+        }
+    ]
     )
-    summary = response.choices[0].text.strip()
+
+    summary = response.choices[0].message.content
+    print(f"Generated summary: {summary}")
 
     # Get title for summary
-    title_response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"Provide a concise title for the following text:\n\n{summary}",
-        max_tokens=64,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    title_response = client.chat.completions.create(
+    model="openai/gpt-4o",
+    messages=[
+        {
+        "role": "user",
+        "content": f"Generate a short, descriptive title for this text:\n\n{transcript}"
+        }
+    ]
     )
-    title = title_response.choices[0].text.strip()
 
+    title = title_response.choices[0].message.content
+    print(f"Generated title: {title}")
+
+    # Sanitize title for filename
+    sanitized_title = sanitize_filename(title)
+    
     # Save summary to file
-    summary_path = os.path.join(data_dir, f"{title}.md")
-    with open(summary_path, "w") as f:
-        f.write(f"# {title}\n\n{summary}")
+    summary_path = os.path.join(data_dir, f"{sanitized_title}.md")
+    try:
+        with open(summary_path, "w") as f:
+            f.write(f"# {title}\n\n{summary}")
+        print(f"Summary saved to: {summary_path}")
+    except Exception as e:
+        print(f"Error saving summary: {e}")
+        # Fallback to a generic filename if sanitization fails
+        summary_path = os.path.join(data_dir, f"summary_{uuid.uuid4().hex}.md")
+        with open(summary_path, "w") as f:
+            f.write(f"# {title}\n\n{summary}")
+        print(f"Summary saved to fallback path: {summary_path}")
 
     return {"summary_path": summary_path}
 
