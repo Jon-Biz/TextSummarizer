@@ -1,6 +1,7 @@
 # Technical Context for TextSummarizer
 
 ## Technology Stack
+
 - Frontend
   * React 18
   * TypeScript
@@ -12,10 +13,9 @@
   * Python 3.9+
   * FastAPI
   * Faster Whisper
-  * Transformers library
-  * SQLAlchemy (potential ORM)
 
 ## Development Environment
+
 - Version Control: Git
 - Package Management
   * npm (frontend)
@@ -23,11 +23,11 @@
 - Recommended IDE: VSCode
 
 ## Performance Considerations
+
 - Efficient audio processing
-- Minimized latency in transcription
 - Optimized summarization algorithms
 
 ## Security Measures
+
 - Input validation
 - CORS configuration
-- Potential JWT authentication
