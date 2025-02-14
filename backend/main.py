@@ -13,6 +13,12 @@ app = FastAPI(
     description="API for transcribing audio and summarizing text",
     version="1.0.0"
 )
+# How fucking embarrassing. 
+# This is required, because if the application halts unexpectedly,
+# on subsequent restarts, FastAPI can't see the variable 'app'
+# and will throw.
+# refering to the variable allows it to be imported by uvicorn
+print(app)
 
 # Configure CORS
 configure_cors(app)
