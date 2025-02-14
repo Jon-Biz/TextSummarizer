@@ -40,11 +40,12 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000 --root-path /api
 - Move business logic from main.py ✓
 - Update main.py to use new services ✓
 
-### Step 5: Reorganize Routes
-- Create api/routes.py
-- Move FastAPI route handlers
-- Create api/__init__.py
-- Update imports and dependencies
+### Step 5: Reorganize Routes ✓
+- Create api/routes.py ✓
+- Move FastAPI route handlers ✓
+- Create api/__init__.py ✓
+- Update main.py to use API router ✓
+- Centralize route definitions ✓
 
 ### Step 6: Refactor Main Application
 - Update main.py to use new modules
@@ -63,7 +64,8 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000 --root-path /api
 ✓ Completed Step 2: Configuration module created and working
 ✓ Completed Step 3: Data access layer created and working
 ✓ Completed Step 4: Services layer created and working
-Ready to begin Step 5: Reorganizing routes
+✓ Completed Step 5: Routes reorganized and centralized
+Ready to begin Step 6: Final main application refactoring
 
 ## Active Decisions
 - Following repository pattern for data management
