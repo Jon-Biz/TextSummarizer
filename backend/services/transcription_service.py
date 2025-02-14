@@ -19,7 +19,13 @@ class TranscriptionService:
         try:
             print(f"Transcribing audio: {file.filename}")
 
-            model = WhisperModel("large-v3", device="cpu", compute_type="float32")
+            # Alternate models:
+            # model = WhisperModel("medium", device="cpu")
+            # model = WhisperModel("small", device="cpu")
+            # model = WhisperModel("distil-large-v3", device="cpu")
+            # model = WhisperModel("large-v3-turbo", device="cpu")
+
+            model = WhisperModel("distil-large-v3", device="cpu", compute_type="float32")
             segments, info = model.transcribe(file.file, initial_prompt=None, word_timestamps=False)
 
             print(f"Transcription info: {info}")
